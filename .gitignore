@@ -1,0 +1,38 @@
+# Personal planning docs — keep local, never commit
+ROADMAP.md
+TASKS.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Data & model artifacts (never commit audio or checkpoints)
+data/
+datasets/
+*.wav
+*.mp3
+*.flac
+*.pt
+*.ckpt
+*.safetensors
+
+# Experiment tracking / logs
+wandb/
+runs/
+lightning_logs/
+*.log
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
