@@ -69,12 +69,17 @@ Audio is not committed to the repo.
 Planned package layout (`src/falsetto/`): `data/`, `extractors/`, `models/`, `training/`,
 `eval/`, `inference/`, `utils/`. Target: Python + PyTorch (CUDA or Apple MPS).
 
-## Citations
+## Credit & attribution
+
+All architectural and methodological credit belongs to **Yumin Kim and Seonghyeon Go**,
+the authors of the two papers this project reproduces. FALSETTO is an independent,
+unofficial reimplementation for learning purposes and is **not affiliated with or endorsed
+by the original authors**.
 
 ```bibtex
 @article{kim2025segment,
   title   = {Segment Transformer: AI-Generated Music Detection via Music Structural Analysis},
-  author  = {Kim and Go},
+  author  = {Kim, Yumin and Go, Seonghyeon},
   journal = {arXiv preprint arXiv:2509.08283},
   year    = {2025}
 }
@@ -82,10 +87,27 @@ Planned package layout (`src/falsetto/`): `data/`, `extractors/`, `models/`, `tr
 @article{kim2026fusion,
   title   = {Fusion Segment Transformer: Bi-Directional Attention Guided Fusion Network
              for AI-Generated Music Detection},
-  author  = {Kim and Go},
+  author  = {Kim, Yumin and Go, Seonghyeon},
   journal = {arXiv preprint arXiv:2601.13647},
   year    = {2026}
 }
 ```
 
-This is an independent reproduction and is not affiliated with the original authors.
+### Built on the work of others
+
+This reproduction stands on pretrained models, tools, and datasets released by other
+researchers. Each retains its **own license and citation requirements** — consult the
+original source before use or redistribution.
+
+**Feature extractors & tools**
+- **MERT** — Li et al., *Acoustic Music Understanding Model with Large-Scale Self-supervised Training* ([arXiv:2306.00107](https://arxiv.org/abs/2306.00107), [code](https://github.com/yizhilll/MERT), [`m-a-p/MERT-v1-95M`](https://huggingface.co/m-a-p/MERT-v1-95M))
+- **Wav2Vec 2.0** — Baevski et al. (Meta AI) ([`facebook/wav2vec2-base`](https://huggingface.co/facebook/wav2vec2-base))
+- **Music2Vec** — MAP group ([`m-a-p/music2vec-v1`](https://huggingface.co/m-a-p/music2vec-v1))
+- **FXencoder** — Koo et al., *Music Mixing Style Transfer: A Contrastive Learning Approach to Disentangle Audio Effects* ([arXiv:2211.02247](https://arxiv.org/abs/2211.02247), [code](https://github.com/jhtonyKoo/music_mixing_style_transfer))
+- **Beat This!** — Foscarin, Schlüter & Widmer, *Accurate Beat Tracking Without DBN Postprocessing*, ISMIR 2024 ([arXiv:2407.21658](https://arxiv.org/abs/2407.21658), [code](https://github.com/CPJKU/beat_this))
+
+**Datasets**
+- **FakeMusicCaps** — text-to-music detection benchmark (MusicGen, MusicLDM, AudioLDM2, Stable Audio Open, Mustango)
+- **SONICS** — large-scale real vs. Suno/Udio detection dataset
+- **AIME** — AI-vs-real music evaluation set (with MTG-Jamendo real tracks)
+- **MTG-Jamendo** — Bogdanov et al., real-music source used for AIME's real class
