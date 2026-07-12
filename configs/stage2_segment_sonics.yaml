@@ -1,0 +1,37 @@
+# Stage-2 Segment Transformer (Paper 1) on a SONICS subset, MERT segment embeddings.
+name: stage2_segment_sonics
+seed: 42
+device: auto
+tracker: tensorboard
+
+data:
+  dataset: sonics
+  manifest: data/manifests/sonics.csv
+  segment_length: 48
+  batch_size: 16
+
+extractor:
+  name: mert
+  pretrained: m-a-p/MERT-v1-95M
+  sample_rate: 24000
+  embed_dim: 768
+
+model:
+  name: segment_transformer
+  d_model: 256
+  n_heads: 8
+  n_layers: 6               # both content + structure encoders
+  ffn_dim: 1024
+  dropout: 0.1
+
+train:
+  epochs: 50                # Paper 1 schedule
+  lr: 1.0e-4
+  weight_decay: 1.0e-2
+  optimizer: fused_adam
+  loss: bce
+  amp: true
+  early_stopping: true
+  patience: 10
+  monitor: auc
+  monitor_mode: max
