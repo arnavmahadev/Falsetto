@@ -14,14 +14,20 @@ venv/
 env/
 
 # Data & model artifacts (never commit audio or checkpoints)
-data/
-datasets/
+# Anchored to repo root so the source package src/falsetto/data/ is NOT ignored.
+/data/
+/datasets/
+checkpoints/
+results/
 *.wav
 *.mp3
 *.flac
 *.pt
 *.ckpt
 *.safetensors
+
+# Generated demo assets (regenerable via scripts/build_demo.py)
+demo_assets/
 
 # Experiment tracking / logs
 wandb/

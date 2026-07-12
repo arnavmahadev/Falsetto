@@ -1,0 +1,38 @@
+# Stage-2 Fusion Segment Transformer (Paper 2) on AIME, MERT segment embeddings.
+name: stage2_fusion_aime
+seed: 42
+device: auto
+tracker: tensorboard
+
+data:
+  dataset: aime
+  manifest: data/manifests/aime.csv
+  segment_length: 48        # pad/crop tracks to 48 4-bar segments
+  batch_size: 16
+
+extractor:
+  name: mert                # Stage-1 embedder used to build segment sequences
+  pretrained: m-a-p/MERT-v1-95M
+  sample_rate: 24000
+  embed_dim: 768
+
+model:
+  name: fusion_segment_transformer
+  d_model: 256
+  n_heads: 8
+  ffn_dim: 1024
+  emb_stream_layers: 6      # embedding stream depth (T-30)
+  ssm_stream_layers: 2      # SSM stream depth (T-31)
+  dropout: 0.1
+
+train:
+  epochs: 200               # Paper 2 FST schedule
+  lr: 1.0e-4
+  weight_decay: 1.0e-2
+  optimizer: fused_adam
+  loss: bce
+  amp: true
+  early_stopping: true
+  patience: 20
+  monitor: auc
+  monitor_mode: max
