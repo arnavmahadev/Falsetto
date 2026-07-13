@@ -1,0 +1,13 @@
+# CPU-only PyTorch wheels keep the Space image small and fast to build.
+# NOTE for a ZeroGPU (GPU) deploy: delete the CPU index line below so the
+# ZeroGPU base image's CUDA build of torch is used, and pin torch>=2.8 (ZeroGPU
+# supports 2.8+). `spaces` is preinstalled on ZeroGPU, so app.py imports it there
+# and no-ops via a shim everywhere else — no requirements change needed for that.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.2
+torchaudio>=2.2
+
+# FALSETTO itself (core deps: transformers, librosa, soundfile, matplotlib, …).
+# gradio is provided by the Space SDK (see sdk_version in README.md), so it is
+# intentionally not pulled here. MERT runs without nnAudio (skips the CQT branch).
+falsetto @ git+https://github.com/arnavmahadev/Falsetto.git@main
