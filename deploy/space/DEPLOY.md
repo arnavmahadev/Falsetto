@@ -8,7 +8,11 @@ A one-time setup, then a single command. Result: a public URL like
 FALSETTO Studio is a **server-side Python app** — it loads PyTorch + the 95M-parameter MERT model
 and runs inference. Static hosts (GitHub Pages) can't run Python at all; serverless/frontend hosts
 (Vercel) cap bundle size and runtime far below what PyTorch needs. Spaces gives a long-running
-container with the model warm in memory, on a free CPU tier, with native Gradio support.
+container with the model warm in memory and native Gradio support.
+
+> **Cost note:** Hugging Face now requires a **PRO** account (~$9/mo) to host Gradio (non-static)
+> Spaces; only static Spaces are free. Everything here is ready to push the moment your account is
+> PRO — or point the same `app.py` at another container host (Railway/Fly) if you'd rather not.
 
 ## One-time setup
 

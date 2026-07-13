@@ -17,7 +17,9 @@ one another over time.
 
 ## Demo — FALSETTO Studio
 
-![FALSETTO Studio analyzing Brahms — Hungarian Dance No. 5: the verdict card, waveform with detected downbeats, self-similarity matrix, and per-segment fusion gate](docs/assets/studio_preview.png)
+![FALSETTO Studio analyzing three tracks: two real recordings read "Strongly structured" while unstructured noise collapses to "Weak / drifting structure", with the self-similarity matrix changing to match](docs/assets/studio_demo.gif)
+
+*The structural-coherence estimate and the self-similarity matrix respond to each track — two real recordings read **Strongly structured**; unstructured noise collapses to **Weak / drifting**.*
 
 A self-contained interactive demo (a *structure explorer*), no dataset download required:
 
@@ -26,8 +28,9 @@ pip install -e ".[demo]"
 python scripts/demo.py            # builds a small model on first run (~2 min), then launches
 ```
 
-Prefer a public link? Deploy your own live copy to **Hugging Face Spaces** in one command —
-see [deploy/space/DEPLOY.md](deploy/space/DEPLOY.md).
+Want a public link? A one-command **Hugging Face Spaces** deploy is included
+([deploy/space/DEPLOY.md](deploy/space/DEPLOY.md)) — note that HF now requires a PRO account to
+host Gradio (non-static) Spaces.
 
 Upload any track (or use the bundled examples — real recordings by Brahms, Tchaikovsky, and
 CC-licensed artists, plus synthetic clips) and Studio runs the **real** pipeline: MERT
@@ -35,6 +38,8 @@ embeddings of beat-tracked segments, a live **self-similarity matrix**, the segm
 and the Fusion model's **per-segment gate**. The self-similarity matrix tells the story at a
 glance — structured music shows repeated blocks/diagonals; drifting or unstructured audio
 doesn't.
+
+![One analysis in full detail — the verdict card, waveform with detected downbeats, self-similarity matrix, and per-segment fusion gate](docs/assets/studio_preview.png)
 
 > **Honest scope.** The full detector classifies real vs. AI from these structural features,
 > but training it needs the labeled datasets (FakeMusicCaps/SONICS/AIME — tens of GB to TB,
