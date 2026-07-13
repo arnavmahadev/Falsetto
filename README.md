@@ -10,10 +10,12 @@ one another over time.
 > **Status — a complete, working reimplementation.** Both papers' models (AudioCAT,
 > FX-Segment, Segment Transformer, Fusion Segment Transformer), the full data pipeline,
 > training/eval loops, inference, and an interactive demo are implemented and covered by a
-> 56-test suite, verified on real MERT features. Reproducing the papers' *benchmark accuracy*
-> is a bounded data + GPU effort — not missing work: the labeled datasets run to tens of GB–TB,
-> so the [Colab notebook](notebooks/train_stage1_colab.ipynb) trains Stage-1 on a real GPU and
-> reports Accuracy/F1/AUC + a confusion matrix, and the same code path scales to the full sets.
+> 56-test suite, verified on real MERT features. **Stage-1 is trained end-to-end** via the
+> [Colab notebook](notebooks/train_stage1_colab.ipynb) — **0.875 accuracy / 0.972 AUC** on a held-out
+> test of a proxy task (real music vs. MusicGen), a demonstration that the pipeline learns, *not* the
+> paper's benchmark. Reproducing the papers' *benchmark accuracy* is a bounded data + GPU scale-up —
+> not missing work: the labeled datasets run to tens of GB–TB, and the same code path scales to them.
+> Full numbers on the [results page](https://arnavmahadev.github.io/Falsetto/).
 
 ## Demo — FALSETTO Studio
 
