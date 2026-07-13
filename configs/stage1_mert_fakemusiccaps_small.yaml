@@ -1,0 +1,46 @@
+# Stage-1 AudioCAT on MERT — SMALL balanced subset for a quick real-metrics run
+# (e.g. a single free Colab GPU session). Reproduces the pipeline, not the paper's
+# full-scale numbers. Build the manifest first with:
+#   python scripts/build_manifest.py --root <data> --out data/manifests/fakemusiccaps_small.csv --max-per-class 300
+name: stage1_mert_fakemusiccaps_small
+seed: 42
+device: auto
+tracker: tensorboard
+
+data:
+  dataset: fakemusiccaps
+  root: data/raw/fakemusiccaps
+  manifest: data/manifests/fakemusiccaps_small.csv
+  clip_seconds: 10.0
+  batch_size: 8
+  num_workers: 2
+  augment: true
+
+extractor:
+  name: mert
+  pretrained: m-a-p/MERT-v1-95M
+  sample_rate: 24000
+  embed_dim: 768
+  returns_sequence: true
+  layer_strategy: weighted
+  freeze: true
+
+model:
+  name: audiocat
+  d_model: 256
+  n_heads: 8
+  n_layers: 4        # a touch smaller than the full config — less overfit on a subset
+  num_latents: 8
+  dropout: 0.1
+
+train:
+  epochs: 12
+  lr: 3.0e-5         # a bit higher than full-scale to converge fast on few clips
+  weight_decay: 1.0e-6
+  optimizer: adam
+  loss: bce
+  amp: true
+  early_stopping: true
+  patience: 4
+  monitor: auc
+  monitor_mode: max
