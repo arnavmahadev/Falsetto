@@ -1,0 +1,9 @@
+# CPU-only PyTorch wheels keep the Space image small and fast to build.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.2
+torchaudio>=2.2
+
+# FALSETTO itself (core deps: transformers, librosa, soundfile, matplotlib, …).
+# gradio is provided by the Space SDK (see sdk_version in README.md), so it is
+# intentionally not pulled here. MERT runs without nnAudio (skips the CQT branch).
+falsetto @ git+https://github.com/arnavmahadev/Falsetto.git@main
