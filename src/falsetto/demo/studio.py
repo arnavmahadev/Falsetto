@@ -110,14 +110,19 @@ validated detector.
 """
 
 
-def build_interface(analyzer: DemoAnalyzer, meta: dict, examples_dir: Path):
+def build_interface(analyzer: DemoAnalyzer, meta: dict, examples_dir: Path, analyze_fn=None):
     import gradio as gr
+
+    # `analyze_fn(waveform, sr) -> DemoResult` lets a host wrap just the compute
+    # step (e.g. ZeroGPU's @spaces.GPU, which attaches a GPU only while it runs)
+    # without this module having to import `spaces`. Defaults to the analyzer.
+    run = analyze_fn if analyze_fn is not None else analyzer.analyze
 
     def analyze(audio_path):
         if not audio_path:
             return "<i style='opacity:.6'>Upload or choose a track to analyze.</i>", None, None, None
         waveform, sr = load_audio(audio_path, mono=True)
-        result = analyzer.analyze(waveform, sr)
+        result = run(waveform, sr)
         return (_verdict_html(result), waveform_figure(waveform, sr, result.features),
                 ssm_figure(result.features), gate_figure(result))
 
@@ -126,7 +131,11 @@ def build_interface(analyzer: DemoAnalyzer, meta: dict, examples_dir: Path):
     ex_labels = [f"{e['title']}  ·  expect {e['expected']}" for e in ex_entries
                  if (examples_dir / e["file"]).exists()]
 
-    with gr.Blocks(title="FALSETTO Studio", analytics_enabled=False) as demo:
+    # Theme + CSS are set on the Blocks itself (not just at launch) so the
+    # styling survives when the app is *mounted* into FastAPI (e.g. on Modal via
+    # mount_gradio_app) rather than launched.
+    with gr.Blocks(title="FALSETTO Studio", theme=_theme(), css=_CSS,
+                   analytics_enabled=False) as demo:
         gr.HTML(
             f"""<div id="fs-nav">
               <span class="brand">FALSETTO<span class="dot">.</span></span>

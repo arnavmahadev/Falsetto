@@ -17,7 +17,7 @@ An interactive **structure explorer** for AI-generated-music detection — a rep
 two-stage *Segment Transformer* (Kim & Go, [arXiv:2509.08283](https://arxiv.org/abs/2509.08283) /
 [arXiv:2601.13647](https://arxiv.org/abs/2601.13647)).
 
-Upload a track (or pick a bundled example) and the app runs the **real** pipeline on CPU:
+Upload a track (or pick a bundled example) and the app runs the **real** pipeline:
 MERT embeddings of beat-tracked segments, a live **self-similarity matrix**, the segmentation,
 and the Fusion model's **per-segment gate**. Structured music shows repeated blocks/diagonals in
 the SSM; drifting or unstructured audio doesn't.

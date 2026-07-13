@@ -10,9 +10,32 @@ and runs inference. Static hosts (GitHub Pages) can't run Python at all; serverl
 (Vercel) cap bundle size and runtime far below what PyTorch needs. Spaces gives a long-running
 container with the model warm in memory and native Gradio support.
 
-> **Cost note:** Hugging Face now requires a **PRO** account (~$9/mo) to host Gradio (non-static)
-> Spaces; only static Spaces are free. Everything here is ready to push the moment your account is
-> PRO — or point the same `app.py` at another container host (Railway/Fly) if you'd rather not.
+> **Cost note (2026):** Hosting this app on a Hugging Face *personal* account now needs **PRO**
+> (~$9/mo) either way — new free accounts can no longer provision **CPU Basic** for a Gradio Space
+> (that's the `402` you'll hit), and the [ZeroGPU docs](https://huggingface.co/docs/hub/en/spaces-zerogpu)
+> state that *hosting* your own ZeroGPU Space also requires PRO (free accounts can only *use* other
+> people's ZeroGPU Spaces). No other free always-on host fits either: Render/Railway/Fly free tiers
+> are ≤512 MB or need a card, and this image is ~1.5 GB (Torch + MERT). `app.py` is ready to run on
+> ZeroGPU (see below) the moment an account is PRO — but see the free Colab path first.
+
+## Free live link, no PRO — run it on Colab
+
+The genuinely-free way to get a real, clickable demo. Colab gives a free GPU and Gradio's
+`share=True` mints a public `https://…gradio.live` link that lives as long as the session
+(~72 h max). Not always-on, but zero cost and it runs the real pipeline on GPU. In a Colab cell:
+
+```python
+!pip -q install "falsetto @ git+https://github.com/arnavmahadev/Falsetto.git@main" gradio
+!git clone -q https://github.com/arnavmahadev/Falsetto.git   # for deploy/space/app.py + demo_assets
+%cd Falsetto
+import subprocess; subprocess.run(["python","scripts/build_demo.py"])  # ~2 min: MERT + example clips
+import sys; sys.path.insert(0, "deploy/space")
+import app                       # loads the analyzer on Colab's CUDA (spaces absent -> shim)
+app.demo.launch(share=True, theme=app._theme(), css=app._CSS)
+```
+
+The same `app.py` runs unchanged: off-Spaces the `@spaces.GPU` decorator is a no-op shim and the
+analyzer auto-selects Colab's real CUDA.
 
 ## One-time setup
 
@@ -34,11 +57,15 @@ That creates the Space (if new), bundles `app.py`, `requirements.txt`, the Space
 the pre-built `demo_assets/` (model + example clips, via LFS), and uploads. First build takes
 ~5–10 min while it installs Torch/Transformers and caches MERT; after that, cold starts are quick.
 
+To run on **ZeroGPU**, select it under the Space's **Settings → Hardware** (PRO), and edit
+`requirements.txt` per its ZeroGPU note (drop the CPU torch index). `app.py` needs no change — it
+detects ZeroGPU at runtime and moves inference onto the attached GPU automatically.
+
 ## What's in this folder
 
 | File | Role |
 |---|---|
-| `app.py` | Space entrypoint — loads bundled assets on CPU, serves the Studio UI. |
+| `app.py` | Space entrypoint — wraps inference in `@spaces.GPU` for ZeroGPU (no-op shim + auto device off-Spaces), serves the Studio UI. |
 | `requirements.txt` | CPU Torch + `falsetto` installed from GitHub `main`. |
 | `README.md` | Space "card" with the Gradio SDK metadata header. |
 | `.gitattributes` | Tracks the model/wavs with Git LFS. |
