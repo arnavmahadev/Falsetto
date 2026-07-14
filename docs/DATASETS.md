@@ -1,4 +1,4 @@
-# Datasets — acquisition, layout, licensing (TASKS.md T-05)
+# Datasets: acquisition, layout, licensing (TASKS.md T-05)
 
 Audio is **never committed** to this repo (`/data/` is git-ignored). Download each
 dataset yourself and record where it lives on disk; the manifest builder
@@ -25,7 +25,7 @@ data/
   cache/               # cached .pt embeddings
 ```
 
-## FakeMusicCaps  *(primary — Stage 1)*
+## FakeMusicCaps  *(primary, Stage 1)*
 - ~**5,373 real** / ~**27,605 AI** 10 s clips; 5 text-to-music models
   (MusicGen, MusicLDM, AudioLDM2, Stable Audio Open, Mustango).
 - Source: text-to-music deepfake detection benchmark (see README references).
@@ -45,6 +45,6 @@ data/
 
 ## Licensing
 Each dataset and the MTG-Jamendo source retain **their own licenses and citation
-requirements** — consult the original source before use or redistribution. This
+requirements**, so consult the original source before use or redistribution. This
 repo bundles none of the audio. See the README "Built on the work of others"
 section for citations.
