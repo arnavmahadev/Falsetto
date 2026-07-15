@@ -1,8 +1,9 @@
-"""Matplotlib figures for the demo — clean, academic styling.
+"""Matplotlib figures for the demo: clean, academic styling.
 
-White ground, a single teal accent, muted blue/red for the human/AI semantic,
-thin de-emphasized spines, no gradients. Generated headless so they can be
-produced and tested without a display.
+Warm cream ground, a single slate-blue accent, slate/amber for the human/AI
+semantic, thin de-emphasized spines, no gradients. Palette matches the results
+site (docs/index.html). Generated headless so they can be produced and tested
+without a display.
 """
 
 from __future__ import annotations
@@ -17,23 +18,23 @@ from matplotlib.colors import LinearSegmentedColormap  # noqa: E402
 
 from .pipeline import DemoFeatures, DemoResult  # noqa: E402
 
-# Slate accent on warm cream — matches the editorial (Papers-With-Code) look.
-ACCENT = "#56658A"
+# Slate accent on warm cream, matching the results-site tokens (docs/index.html).
+ACCENT = "#47567C"
 TEAL = ACCENT  # backwards-compatible alias
-INK = "#1C1A16"
-MUTED = "#6A675E"
-GRID = "#E4DFD4"
-PAPER = "#F6F4EE"
-HUMAN = "#56658A"
-AI = "#9C6A42"
+INK = "#1B1915"
+MUTED = "#6A6459"
+GRID = "#E1DBCC"
+PAPER = "#FCFAF4"  # the site's --surface, so plots blend into their gr.Plot blocks
+HUMAN = "#47567C"  # --accent
+AI = "#946517"     # --pending (amber)
 
 # Cream -> slate -> deep sequential map.
-SSM_CMAP = LinearSegmentedColormap.from_list("falsetto", ["#F3F1EA", "#AAB3C8", ACCENT, "#2A3346"])
+SSM_CMAP = LinearSegmentedColormap.from_list("falsetto", ["#F4F1E9", "#A6B0CC", ACCENT, "#232B40"])
 
 _BASE_RC = {
     "figure.facecolor": PAPER,
     "axes.facecolor": PAPER,
-    "axes.edgecolor": "#CFC9BC",
+    "axes.edgecolor": "#C9C1AE",
     "axes.labelcolor": MUTED,
     "axes.titlecolor": INK,
     "xtick.color": MUTED,
@@ -98,7 +99,7 @@ def waveform_figure(waveform: torch.Tensor, sr: int, features: DemoFeatures):
 
 
 def gate_figure(result: DemoResult):
-    """Per-segment fusion gate — content vs. structure weighting."""
+    """Per-segment fusion gate: content vs. structure weighting."""
     g = result.gate_per_segment or [0.5]
     x = np.arange(len(g))
     with plt.rc_context(_BASE_RC):
