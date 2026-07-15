@@ -45,7 +45,7 @@ def _cache_mert() -> None:
 
 image = (
     modal.Image.debian_slim(python_version="3.11")
-    # ffmpeg + libsndfile cover audio decoding (uploads may be mp3/flac/…).
+    # ffmpeg + libsndfile cover audio decoding (example clips may be mp3/flac/…).
     .apt_install("git", "ffmpeg", "libsndfile1")
     .env({"HF_HOME": HF_CACHE, "GRADIO_ANALYTICS_ENABLED": "False"})
     # CPU-only Torch keeps the image lean; Modal runs this on CPU.
@@ -77,12 +77,14 @@ def ui():
     from fastapi import FastAPI
     from gradio.routes import mount_gradio_app
 
-    from falsetto.demo.studio import build_interface, load_analyzer
+    from falsetto.demo.studio import _CSS, _theme, build_interface, load_analyzer
 
     # Loaded once per container (i.e. once per cold start), then reused.
     analyzer, meta = load_analyzer(ASSETS_REMOTE, device="cpu")
     demo = build_interface(analyzer, meta, Path(ASSETS_REMOTE) / "examples")
     demo.queue(max_size=20)
-    # Theme/CSS ride along on the Blocks (set in build_interface), so mounting
-    # preserves the styling without calling demo.launch().
-    return mount_gradio_app(app=FastAPI(), blocks=demo, path="/")
+    # Gradio 6 applies the theme + CSS at the mount boundary (not on the Blocks),
+    # so pass them here. Modal mounts the app rather than calling demo.launch(),
+    # so this is what dresses the demo in the editorial results-site styling.
+    # (Forcing the light theme is handled by a load hook inside build_interface.)
+    return mount_gradio_app(app=FastAPI(), blocks=demo, path="/", theme=_theme(), css=_CSS)
