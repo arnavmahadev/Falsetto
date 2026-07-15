@@ -186,8 +186,15 @@ class Stage1Trainer:
 # --------------------------------------------------------------------------- #
 # Config-driven entry point
 # --------------------------------------------------------------------------- #
-def train_stage1_from_config(cfg: Config, manifest=None) -> Path:
-    """Build data + model from a :class:`Config` and train. Returns best ckpt path."""
+def train_stage1_from_config(cfg: Config, manifest=None, resume: str | Path | None = None) -> Path:
+    """Build data + model from a :class:`Config` and train. Returns best ckpt path.
+
+    ``resume`` reloads the weights from a previous checkpoint and carries its best
+    monitor value forward, so a run cut short by a dropped session (a closed laptop,
+    a reclaimed Colab VM) continues instead of paying for those epochs twice. The
+    optimizer state is not in the checkpoint, so Adam's moments restart; that costs
+    roughly an epoch of re-warming, which is far cheaper than starting over.
+    """
     from ..data.datasets import Stage1ClipDataset, make_dataloader
     from ..data.manifests import load_manifest
     from ..data.augment import Augmentor
@@ -218,6 +225,21 @@ def train_stage1_from_config(cfg: Config, manifest=None) -> Path:
     if cfg.tracker != "none":
         tracker = ExperimentTracker(cfg.tracker, cfg.output_dir, cfg.name)
     trainer = Stage1Trainer(model, cfg.train, device, tracker, run_name=cfg.name)
+
+    if resume:
+        state = torch.load(resume, map_location=device, weights_only=False)
+        model.load_state_dict(state["model_state"])
+        # Carry the best score forward, or the first epoch would look like an
+        # improvement on -inf and overwrite a better checkpoint with a worse one.
+        prev = state.get("monitor_value")
+        if prev is not None and state.get("monitor") == cfg.train.monitor:
+            trainer._best = prev
+        _log.info(
+            "resumed from %s (epoch %s, %s=%.4f)",
+            resume, state.get("epoch", "?") + 1 if isinstance(state.get("epoch"), int) else "?",
+            state.get("monitor", "?"), prev if prev is not None else float("nan"),
+        )
+
     ckpt = trainer.fit(train_loader, val_loader)
     if tracker:
         tracker.close()

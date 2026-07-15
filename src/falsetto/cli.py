@@ -66,7 +66,7 @@ def _cmd_train(args) -> int:
     if args.stage == 1:
         from .training.train_stage1 import train_stage1_from_config
 
-        ckpt = train_stage1_from_config(cfg)
+        ckpt = train_stage1_from_config(cfg, resume=args.resume)
     else:
         if not args.seqcache:
             log.error("stage 2 needs --seqcache <dir> of precomputed sequences")
@@ -126,6 +126,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_tr.add_argument("--config", required=True)
     p_tr.add_argument("--stage", type=int, choices=(1, 2), default=1)
     p_tr.add_argument("--seqcache", help="stage-2 sequence cache dir")
+    p_tr.add_argument("--resume", help="stage-1 checkpoint to continue from (e.g. after a dropped session)")
     p_tr.add_argument("--epochs", type=int)
     p_tr.add_argument("--device")
     p_tr.set_defaults(func=_cmd_train)
