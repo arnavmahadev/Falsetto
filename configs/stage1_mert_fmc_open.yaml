@@ -1,0 +1,59 @@
+# Stage-1 AudioCAT on MERT features — FakeMusicCaps' generated clips against
+# open-licensed real music.
+#
+# This is NOT the paper's FakeMusicCaps benchmark. The AI half is the paper's real
+# generated audio (Zenodo 15063698: 5 TTM models x 5,521 captions). The real half
+# cannot be: FakeMusicCaps sources its real class from MusicCaps, which Google
+# publishes as YouTube ids rather than audio. So the real half here is open-licensed
+# music instead, and the resulting score is a proxy that must be reported as one.
+#
+# Both classes are held at 16 kHz mono. The generated clips are 16 kHz, so any
+# wider-band real audio would leave the 8-12 kHz octave empty for AI and full for
+# real, and the classifier would score near-perfectly off that cutoff alone while
+# learning nothing about music. See the notebook's bandwidth-parity guard.
+#
+# Build the manifest first:
+#   python scripts/build_manifest.py --root data/raw/fmc_open \
+#       --out data/manifests/fmc_open.csv --max-per-class 5000
+name: stage1_mert_fmc_open
+seed: 42
+device: auto
+tracker: tensorboard
+
+data:
+  dataset: fakemusiccaps
+  root: data/raw/fmc_open
+  manifest: data/manifests/fmc_open.csv
+  clip_seconds: 10.0
+  batch_size: 16         # frozen MERT leaves headroom on a free T4
+  num_workers: 2
+  augment: true
+
+extractor:
+  name: mert
+  pretrained: m-a-p/MERT-v1-95M
+  sample_rate: 24000
+  embed_dim: 768
+  returns_sequence: true
+  layer_strategy: weighted
+  freeze: true
+
+model:
+  name: audiocat
+  d_model: 256
+  n_heads: 8
+  n_layers: 6            # full depth; there is enough data here to train it
+  num_latents: 8
+  dropout: 0.1
+
+train:
+  epochs: 25
+  lr: 1.0e-5             # full-scale value; the subset lr would be too hot here
+  weight_decay: 1.0e-6
+  optimizer: adam
+  loss: bce
+  amp: true
+  early_stopping: true
+  patience: 6
+  monitor: auc
+  monitor_mode: max

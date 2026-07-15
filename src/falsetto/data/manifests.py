@@ -34,6 +34,9 @@ MANIFEST_COLUMNS = [
 # Real vs. the five FakeMusicCaps text-to-music generators.
 FAKEMUSICCAPS_MODELS = {
     "musicgen",
+    # The Zenodo release ships MusicGen as `MusicGen_medium/`; without the exact
+    # name it falls through to the unknown-source fallback and loses attribution.
+    "musicgen_medium",
     "musicldm",
     "audioldm2",
     "stableaudioopen",
@@ -210,6 +213,12 @@ def scan_fakemusiccaps(root: str | Path) -> list[dict]:
         if path.suffix.lower() not in AUDIO_EXTS:
             continue
         rel = path.relative_to(root)
+        # The Zenodo zip carries an __MACOSX/ tree of AppleDouble stubs that shadow
+        # every real clip ("._track.wav"). They end in .wav, so without this they
+        # scan as audio, land in the manifest, and get labelled by their shadowed
+        # model dir. Unzipping on a Mac reintroduces them, so filter here too.
+        if any(p == "__MACOSX" for p in rel.parts) or path.name.startswith("._"):
+            continue
         label, source = _classify_fakemusiccaps(rel.parts)
         track_id = _base_track_id(path.stem)
         records.append(

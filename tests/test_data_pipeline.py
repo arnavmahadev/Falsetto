@@ -119,6 +119,36 @@ def test_augmentor_disabled_is_identity():
 # --------------------------------------------------------------------------- #
 # T-06 manifest + split
 # --------------------------------------------------------------------------- #
+def test_scan_matches_real_zenodo_layout(tmp_path):
+    """The published zip's folder names and __MACOSX stubs, not the idealised ones.
+
+    Zenodo record 15063698 ships `MusicGen_medium/` (not `MusicGen/`) and an
+    __MACOSX/ tree whose AppleDouble stubs are named `._<track>.wav`, so they
+    match AUDIO_EXTS and otherwise scan as real clips.
+    """
+    root = tmp_path / "FakeMusicCaps"
+    sr = 32000
+    zenodo_dirs = ["MusicGen_medium", "audioldm2", "musicldm", "mustango", "stable_audio_open"]
+    n_tracks = 4
+    for i in range(n_tracks):
+        tid = f"dHGAXJ9RPJ{i}"
+        for d in zenodo_dirs:
+            save_audio(root / d / f"{tid}.wav", _tone(sr, 1.0, 300 + i), sr)
+            # AppleDouble stub shadowing each clip, as the zip carries it
+            stub = root / "__MACOSX" / d / f"._{tid}.wav"
+            stub.parent.mkdir(parents=True, exist_ok=True)
+            stub.write_bytes(b"\x00\x05\x16\x07")
+
+    records = scan_fakemusiccaps(root)
+    assert len(records) == n_tracks * len(zenodo_dirs)
+    assert not any("__MACOSX" in r["filepath"] for r in records)
+    # Every generator dir is attributed, none fall back to "unknown"
+    assert {r["source"] for r in records} == {d.lower() for d in zenodo_dirs}
+    assert all(r["label"] == 1 for r in records)
+    # One id per caption, shared across the five generators, so splits stay leak-free
+    assert len({r["track_id"] for r in records}) == n_tracks
+
+
 def test_scan_and_build_manifest(fake_dataset):
     root, _sr, n_tracks = fake_dataset
     records = scan_fakemusiccaps(root)
