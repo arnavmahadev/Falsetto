@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-"""FALSETTO Studio — the interactive demo (TASKS.md T-43).
+"""FALSETTO Studio — the results showcase (TASKS.md T-43).
 
-Self-contained: runs the real MERT / beat-tracking / SSM / Fusion pipeline on any
-uploaded track and shows the self-similarity matrix, segments, fusion gate and a
-verdict. On first run it builds the demo assets (checkpoint + example clips)
+Self-contained: runs the real MERT / beat-tracking / SSM / Fusion pipeline on a set
+of bundled example tracks and shows, for the selected track, the self-similarity
+matrix, segments, fusion gate and a verdict. It presents results; it is not an
+upload tool. On first run it builds the demo assets (checkpoint + example clips)
 automatically; no dataset download required.
 
 Requires the demo extra:  pip install -e ".[demo]"
